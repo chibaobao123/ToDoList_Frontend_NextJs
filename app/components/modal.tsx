@@ -4,16 +4,13 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
 
-export default function Modals({
-  showModal,
-  editTitle,
-  handleClose,
-}: {
-  showModal: boolean;
-  editTitle: string;
-  handleClose: () => void;
-}) {
+import { IModalProps } from "./todo";
+
+export default function Modals(props: IModalProps) {
+  const { todo, showModal, editTitle, handleClose } = props;
   return (
     <Modal show={showModal} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -28,7 +25,13 @@ export default function Modals({
           <Form>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Form.Label>Title</Form.Label>
-              <Form.Control type="text" placeholder="ABCD......" />
+              <Form.Control type="text" defaultValue={todo.title} />
+              <Form.Label>Status</Form.Label>
+              <Form.Select defaultValue={todo.status}>
+                <option value="0">Processing</option>
+                <option value="1">Completed</option>
+                <option value="2">Cancel</option>
+              </Form.Select>
             </Form.Group>
           </Form>
         ) : (
