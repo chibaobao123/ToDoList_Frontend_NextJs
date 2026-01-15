@@ -1,16 +1,36 @@
 "use client";
+import { useState, useEffect } from "react";
 
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
-import Dropdown from "react-bootstrap/Dropdown";
-import DropdownButton from "react-bootstrap/DropdownButton";
 
 import { IModalProps } from "./todo";
 
 export default function Modals(props: IModalProps) {
-  const { todo, showModal, editTitle, handleClose } = props;
+  const { todo, showModal, editTitle, handleClose, handleUpdateTodo } = props;
+
+  const [todoUpdate, setTodoUpdate] = useState(todo);
+
+  useEffect(() => {
+    // Mỗi khi props.todo thay đổi (khi bạn bấm nút Edit khác),
+    // hãy cập nhật lại state nội bộ của Modal
+    setTodoUpdate(todo);
+  }, [todo]);
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    // console.log("Changing:", name, value);
+    setTodoUpdate({
+      ...todoUpdate,
+      [name]: name === "status" ? Number(value) : value,
+    });
+  };
   return (
     <Modal show={showModal} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -25,9 +45,18 @@ export default function Modals(props: IModalProps) {
           <Form>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Form.Label>Title</Form.Label>
-              <Form.Control type="text" defaultValue={todo.title} />
+              <Form.Control
+                type="text"
+                name="title"
+                defaultValue={todo.title}
+                onChange={handleChange}
+              />
               <Form.Label>Status</Form.Label>
-              <Form.Select defaultValue={todo.status}>
+              <Form.Select
+                defaultValue={todo.status}
+                name="status"
+                onChange={handleChange}
+              >
                 <option value="0">Processing</option>
                 <option value="1">Completed</option>
                 <option value="2">Cancel</option>
@@ -45,7 +74,10 @@ export default function Modals(props: IModalProps) {
           Close
         </Button>
         {editTitle === "Edited" ? (
-          <Button variant="primary" onClick={handleClose}>
+          <Button
+            variant="primary"
+            onClick={() => handleUpdateTodo(todoUpdate)}
+          >
             Save Changes
           </Button>
         ) : (

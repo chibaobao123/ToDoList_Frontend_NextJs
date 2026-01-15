@@ -25,6 +25,7 @@ export interface IModalProps {
   showModal: boolean;
   editTitle: string;
   handleClose: () => void;
+  handleUpdateTodo: (todoUpdate: ITodo) => void;
 }
 
 export default function Todo() {
@@ -54,21 +55,16 @@ export default function Todo() {
   ]);
   const [todo, setTodo] = useState<ITodo>({ id: 0, title: "", status: 0 });
 
-  const handleUpdateTodo = () => {
-    // 1. Tạo bản sao của mảng lists để tránh mutate state trực tiếp
-    const updatedLists = lists.map((item) => {
-      if (item.id === todo.id) {
-        // 2. Nếu tìm thấy ID trùng khớp, trả về đối tượng todo đã sửa
-        return todo;
-      }
-      // 3. Nếu không phải, giữ nguyên phần tử đó
-      return item;
-    });
+  const handleUpdateTodo = (todoUpdate: ITodo) => {
+    console.log("Updating Todo:", todoUpdate);
+    const updatedLists = [...lists]; // Copy mảng gốc
+    const index = updatedLists.findIndex((item) => item.id === todoUpdate.id);
 
-    // 4. Cập nhật lại state lists
-    setLists(updatedLists);
+    if (index !== -1) {
+      updatedLists[index] = todoUpdate; // Thay thế tại vị trí tìm thấy
+      setLists(updatedLists);
+    }
 
-    // 5. Đóng modal sau khi lưu thành công
     handleClose();
   };
 
@@ -160,6 +156,7 @@ export default function Todo() {
         showModal={show}
         editTitle={editTitle}
         handleClose={handleClose}
+        handleUpdateTodo={handleUpdateTodo}
       />
     </>
   );
