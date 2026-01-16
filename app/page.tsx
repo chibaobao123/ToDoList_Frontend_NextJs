@@ -22,26 +22,6 @@ export default function Home() {
           <Row className="justify-content-center">
             <Col md={6} lg={5}>
               {/* Thanh Input ADD */}
-              <div
-                className="d-flex mb-5 shadow-sm"
-                style={{
-                  borderRadius: "50px",
-                  overflow: "hidden",
-                  backgroundColor: "#fff",
-                }}
-              >
-                <Form.Control
-                  placeholder="What do you need to do?"
-                  className="border-0 px-4 py-3 shadow-none"
-                  style={{ fontSize: "1.1rem", color: "#666" }}
-                />
-                <Button
-                  className="border-0 px-5 fw-bold"
-                  style={{ backgroundColor: "#93C1D2", letterSpacing: "2px" }}
-                >
-                  ADD
-                </Button>
-              </div>
               <Todo />
             </Col>
           </Row>

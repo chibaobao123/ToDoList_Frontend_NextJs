@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Modals from "./modal";
+import InputAdd from "./inputAdd";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -17,6 +18,7 @@ export interface ITodo {
   id: number;
   title: string;
   status: number;
+  active: boolean;
 }
 
 // Interface represents all the Props of the Component
@@ -26,7 +28,10 @@ export interface IModalProps {
   editTitle: string;
   handleClose: () => void;
   handleUpdateTodo: (todoUpdate: ITodo) => void;
-  handleDeleteTodo: (id: number) => void;
+}
+
+export interface IInputAddProps {
+  addTodo: (newTodo: ITodo) => void;
 }
 
 export default function Todo() {
@@ -44,17 +49,23 @@ export default function Todo() {
     setTodo(list);
   };
 
-  const handleDelete = () => {
-    setEditTitle("Deleted");
-    handleShow();
-  };
-
   const [lists, setLists] = useState([
-    { id: 1, title: "Mark", status: 0 },
-    { id: 2, title: "Mark", status: 2 },
-    { id: 3, title: "Mark", status: 1 },
+    { id: 1, title: "go to gym", status: 0, active: true },
+    { id: 2, title: "play badminton", status: 2, active: true },
+    { id: 3, title: "coffee time", status: 1, active: true },
   ]);
-  const [todo, setTodo] = useState<ITodo>({ id: 0, title: "", status: 0 });
+
+  const [todo, setTodo] = useState<ITodo>({
+    id: 0,
+    title: "",
+    status: 0,
+    active: true,
+  });
+
+  const addTodo = (newTodo: ITodo) => {
+    newTodo.id = lists.length + 1;
+    setLists([...lists, newTodo]);
+  };
 
   const handleUpdateTodo = (todoUpdate: ITodo) => {
     console.log("Updating Todo:", todoUpdate);
@@ -62,7 +73,7 @@ export default function Todo() {
     const index = updatedLists.findIndex((item) => item.id === todoUpdate.id);
 
     if (index !== -1) {
-      updatedLists[index] = todoUpdate; // Thay thế tại vị trí tìm thấy
+      updatedLists[index] = todoUpdate;
       setLists(updatedLists);
     }
 
@@ -70,18 +81,21 @@ export default function Todo() {
   };
 
   const handleDeleteTodo = (id: number) => {
-    // Tạo mảng mới chỉ bao gồm các item có ID khác với ID cần xóa
-    const updatedLists = lists.filter((item) => item.id !== id);
+    const updatedLists = lists.map((item) => {
+      if (item.id === id) {
+        return { ...item, active: false };
+      }
+      return item;
+    });
 
-    // Cập nhật lại state lists
     setLists(updatedLists);
 
-    // Đóng modal sau khi xóa thành công (nếu bạn xóa từ Modal)
     handleClose();
   };
 
   return (
     <>
+      <InputAdd addTodo={addTodo} />
       {/* Card Todo List */}
       <Card
         className="border-0 shadow-sm p-4"
@@ -89,61 +103,70 @@ export default function Todo() {
       >
         <Card.Body className="p-0">
           <div className="todo-list" style={{ minHeight: "300px" }}>
-            {lists.map((list) => (
-              <div
-                key={list.id}
-                className="d-flex align-items-center mb-4 group cursor-pointer"
-              >
-                <></>
-                {/* Checkbox Icon */}
-                <div
-                  className="me-3"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleEdit(list)}
-                >
-                  {list.status === 1 ? (
-                    <FontAwesomeIcon
-                      icon={faCheckCircle}
-                      size="2x"
-                      style={{ color: "#D1914B" }}
-                    />
-                  ) : list.status === 0 ? (
-                    <FontAwesomeIcon
-                      icon={faCircle}
-                      size="2x"
-                      style={{ color: "#BCBCBC" }}
-                    />
-                  ) : (
-                    <FontAwesomeIcon
-                      icon={faCircle}
-                      size="2x"
-                      style={{ color: "#f90404ff" }}
-                    />
-                  )}
-                </div>
+            {lists.map((list) => {
+              if (list.active) {
+                return (
+                  <div
+                    key={list.id}
+                    className="d-flex align-items-center mb-4 group cursor-pointer"
+                  >
+                    <></>
+                    {/* Checkbox Icon */}
+                    <div
+                      className="me-3"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleEdit(list)}
+                    >
+                      {list.status === 1 ? (
+                        <FontAwesomeIcon
+                          icon={faCheckCircle}
+                          size="2x"
+                          style={{ color: "#D1914B" }}
+                        />
+                      ) : list.status === 0 ? (
+                        <FontAwesomeIcon
+                          icon={faCircle}
+                          size="2x"
+                          style={{ color: "#BCBCBC" }}
+                        />
+                      ) : (
+                        <FontAwesomeIcon
+                          icon={faCircle}
+                          size="2x"
+                          style={{ color: "#f90404ff" }}
+                        />
+                      )}
+                    </div>
 
-                {/* Title */}
-                <span
-                  className="flex-grow-1 fs-5"
-                  style={{
-                    color: list.status === 0 ? "#333333" : "#BCBCBC",
-                    textDecoration: list.status === 1 ? "line-through" : "none",
-                    fontWeight: "500",
-                  }}
-                  onClick={() => handleEdit(list)}
-                >
-                  {list.title}
-                </span>
+                    {/* Title */}
+                    <span
+                      className="flex-grow-1 fs-5"
+                      style={{
+                        color: list.status === 0 ? "#333333" : "#BCBCBC",
+                        textDecoration:
+                          list.status === 1 ? "line-through" : "none",
+                        fontWeight: "500",
+                      }}
+                      onClick={() => handleEdit(list)}
+                    >
+                      {list.title}
+                    </span>
 
-                {/* Trash Icon */}
-                <FontAwesomeIcon
-                  icon={faTrashAlt}
-                  style={{ color: "#E6B9B9", cursor: "pointer", opacity: 0.6 }}
-                  className="trash-hover"
-                  onClick={() => handleDeleteTodo(list.id)}
-                />
-              </div>
-            ))}
+                    {/* Trash Icon */}
+                    <FontAwesomeIcon
+                      icon={faTrashAlt}
+                      style={{
+                        color: "#E6B9B9",
+                        cursor: "pointer",
+                        opacity: 0.6,
+                      }}
+                      className="trash-hover"
+                      onClick={() => handleDeleteTodo(list.id)}
+                    />
+                  </div>
+                );
+              }
+            })}
           </div>
 
           {/* Clear Completed Button */}
@@ -152,6 +175,13 @@ export default function Todo() {
               variant="link"
               className="text-decoration-none fw-bold d-flex align-items-center justify-content-center mx-auto"
               style={{ color: "#D1914B" }}
+              onClick={() => {
+                const updatedLists = lists.map((item) => ({
+                  ...item,
+                  active: false,
+                }));
+                setLists(updatedLists);
+              }}
             >
               <FontAwesomeIcon
                 icon={faMobileAlt}
