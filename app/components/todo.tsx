@@ -26,6 +26,7 @@ export interface IModalProps {
   editTitle: string;
   handleClose: () => void;
   handleUpdateTodo: (todoUpdate: ITodo) => void;
+  handleDeleteTodo: (id: number) => void;
 }
 
 export default function Todo() {
@@ -65,6 +66,17 @@ export default function Todo() {
       setLists(updatedLists);
     }
 
+    handleClose();
+  };
+
+  const handleDeleteTodo = (id: number) => {
+    // Tạo mảng mới chỉ bao gồm các item có ID khác với ID cần xóa
+    const updatedLists = lists.filter((item) => item.id !== id);
+
+    // Cập nhật lại state lists
+    setLists(updatedLists);
+
+    // Đóng modal sau khi xóa thành công (nếu bạn xóa từ Modal)
     handleClose();
   };
 
@@ -128,7 +140,7 @@ export default function Todo() {
                   icon={faTrashAlt}
                   style={{ color: "#E6B9B9", cursor: "pointer", opacity: 0.6 }}
                   className="trash-hover"
-                  onClick={handleDelete}
+                  onClick={() => handleDeleteTodo(list.id)}
                 />
               </div>
             ))}
