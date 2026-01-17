@@ -9,7 +9,7 @@ import Alert from "react-bootstrap/Alert";
 import { IModalProps } from "./todo";
 
 export default function Modals(props: IModalProps) {
-  const { todo, showModal, editTitle, handleClose, handleUpdateTodo } = props;
+  const { todo, showModal, editTitle, handleClose, handleUpdateTodo, handleDeleteTodo } = props;
 
   const [todoUpdate, setTodoUpdate] = useState(todo);
 
@@ -81,7 +81,7 @@ export default function Modals(props: IModalProps) {
             Save Changes
           </Button>
         ) : (
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={() => handleDeleteTodo(todo.id)}>
             Delete
           </Button>
         )}

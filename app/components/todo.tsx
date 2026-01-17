@@ -28,6 +28,7 @@ export interface IModalProps {
   editTitle: string;
   handleClose: () => void;
   handleUpdateTodo: (todoUpdate: ITodo) => void;
+  handleDeleteTodo: (id: number) => void;
 }
 
 export interface IInputAddProps {
@@ -37,17 +38,6 @@ export interface IInputAddProps {
 export default function Todo() {
   const [show, setShow] = useState(false);
   const [editTitle, setEditTitle] = useState("Edited");
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
-  const handleEdit = (list: ITodo) => {
-    setEditTitle("Edited");
-    handleShow();
-
-    // console.log(list);
-    setTodo(list);
-  };
 
   const [lists, setLists] = useState([
     { id: 1, title: "go to gym", status: 0, active: true },
@@ -62,13 +52,29 @@ export default function Todo() {
     active: true,
   });
 
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const handleEdit = (todo: ITodo) => {
+    setEditTitle("Edited");
+    handleShow();
+
+    setTodo(todo);
+  };
+
+  const handleDelete = (todo: ITodo) => {
+    setEditTitle("Delete");
+    handleShow();
+
+    setTodo(todo);
+  };
+
   const addTodo = (newTodo: ITodo) => {
     newTodo.id = lists.length + 1;
     setLists([...lists, newTodo]);
   };
 
   const handleUpdateTodo = (todoUpdate: ITodo) => {
-    console.log("Updating Todo:", todoUpdate);
     const updatedLists = [...lists]; // Copy mảng gốc
     const index = updatedLists.findIndex((item) => item.id === todoUpdate.id);
 
@@ -82,7 +88,7 @@ export default function Todo() {
 
   const handleDeleteTodo = (id: number) => {
     const updatedLists = lists.map((item) => {
-      if (item.id === id) {
+      if (item.id === id && item.active) {
         return { ...item, active: false };
       }
       return item;
@@ -156,12 +162,12 @@ export default function Todo() {
                     <FontAwesomeIcon
                       icon={faTrashAlt}
                       style={{
-                        color: "#E6B9B9",
+                        color: "#e02121ff",
                         cursor: "pointer",
                         opacity: 0.6,
                       }}
                       className="trash-hover"
-                      onClick={() => handleDeleteTodo(list.id)}
+                      onClick={() => handleDelete(list)}
                     />
                   </div>
                 );
@@ -199,6 +205,7 @@ export default function Todo() {
         editTitle={editTitle}
         handleClose={handleClose}
         handleUpdateTodo={handleUpdateTodo}
+        handleDeleteTodo={handleDeleteTodo}
       />
     </>
   );
