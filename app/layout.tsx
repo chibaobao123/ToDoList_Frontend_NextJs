@@ -4,6 +4,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import BootstrapClient from "./BootstrapClient";
 import "./globals.css";
 
+import StoreProvider from "./StoreProvider";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,7 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <StoreProvider>{children}</StoreProvider>
         <BootstrapClient />
       </body>
     </html>
