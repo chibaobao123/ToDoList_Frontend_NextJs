@@ -1,5 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+import { RootState } from "../redux/configStore"; // Import kiểu RootState bạn đã định nghĩa
+import { useSelector, useDispatch } from "react-redux";
+// Import action từ file slice
+import {
+  ITodo,
+  addTodo,
+  deleteTodo,
+  updateTodo,
+} from "../redux/reducers/todoReducer";
+
 import Modals from "./modal";
 import InputAdd from "./inputAdd";
 
@@ -13,14 +24,6 @@ import {
   faMobileAlt,
 } from "@fortawesome/free-solid-svg-icons";
 
-// Interface for major data
-export interface ITodo {
-  id: number;
-  title: string;
-  status: number;
-  active: boolean;
-}
-
 // Interface represents all the Props of the Component
 export interface IModalProps {
   todo: ITodo;
@@ -32,18 +35,18 @@ export interface IModalProps {
 }
 
 export interface IInputAddProps {
-  addTodo: (newTodo: ITodo) => void;
+  addNewTodo: (newTodo: ITodo) => void;
 }
 
 export default function Todo() {
+  // Lấy dữ liệu từ slice 'todos'
+  const todos = useSelector((state: RootState) => state.todoReducer.todos);
+  const dispatch = useDispatch();
+
   const [show, setShow] = useState(false);
   const [editTitle, setEditTitle] = useState("Edited");
 
-  const [lists, setLists] = useState([
-    { id: 1, title: "go to gym", status: 0, active: true },
-    { id: 2, title: "play badminton", status: 2, active: true },
-    { id: 3, title: "coffee time", status: 1, active: true },
-  ]);
+  const [lists, setLists] = useState<ITodo[]>(todos);
 
   const [todo, setTodo] = useState<ITodo>({
     id: 0,
@@ -51,6 +54,11 @@ export default function Todo() {
     status: 0,
     active: true,
   });
+
+  // Cập nhật local state khi store thay đổi
+  useEffect(() => {
+    setLists(todos);
+  }, [todos]);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -69,39 +77,25 @@ export default function Todo() {
     setTodo(todo);
   };
 
-  const addTodo = (newTodo: ITodo) => {
-    newTodo.id = lists.length + 1;
-    setLists([...lists, newTodo]);
+  const addNewTodo = (newTodo: ITodo) => {
+    dispatch(addTodo(newTodo));
   };
 
   const handleUpdateTodo = (todoUpdate: ITodo) => {
-    const updatedLists = [...lists]; // Copy mảng gốc
-    const index = updatedLists.findIndex((item) => item.id === todoUpdate.id);
-
-    if (index !== -1) {
-      updatedLists[index] = todoUpdate;
-      setLists(updatedLists);
-    }
+    dispatch(updateTodo(todoUpdate));
 
     handleClose();
   };
 
   const handleDeleteTodo = (id: number) => {
-    const updatedLists = lists.map((item) => {
-      if (item.id === id && item.active) {
-        return { ...item, active: false };
-      }
-      return item;
-    });
-
-    setLists(updatedLists);
+    dispatch(deleteTodo(id));
 
     handleClose();
   };
 
   return (
     <>
-      <InputAdd addTodo={addTodo} />
+      <InputAdd addNewTodo={addNewTodo} />
       {/* Card Todo List */}
       <Card
         className="border-0 shadow-sm p-4"

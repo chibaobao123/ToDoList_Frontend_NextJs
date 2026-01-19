@@ -2,10 +2,11 @@
 import { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { IInputAddProps } from "./todo";
+import { ITodo } from "../redux/reducers/todoReducer";
 
 export default function InputAdd(props: IInputAddProps) {
-  const { addTodo } = props;
-  const [todoAdd, setTodoAdd] = useState({
+  const { addNewTodo } = props;
+  const [todoAdd, setTodoAdd] = useState<ITodo>({
     id: 0,
     title: "",
     status: 0,
@@ -13,13 +14,22 @@ export default function InputAdd(props: IInputAddProps) {
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setTodoAdd({
       ...todoAdd,
       [name]: value,
     });
+  };
+
+  const handleAddNewTodo = (newTodoAdd: ITodo) => {
+    setTodoAdd({ ...todoAdd, id: 0, title: "" });
+    const newTodo: ITodo = {
+      ...newTodoAdd,
+      id: Date.now(),
+    };
+    return addNewTodo(newTodo);
   };
   return (
     <div
@@ -41,10 +51,7 @@ export default function InputAdd(props: IInputAddProps) {
       <Button
         className="border-0 px-5 fw-bold"
         style={{ backgroundColor: "#93C1D2", letterSpacing: "2px" }}
-        onClick={() => {
-          setTodoAdd({ ...todoAdd, id: 0, title: "" });
-          return addTodo(todoAdd);
-        }}
+        onClick={() => handleAddNewTodo(todoAdd)}
       >
         ADD
       </Button>
