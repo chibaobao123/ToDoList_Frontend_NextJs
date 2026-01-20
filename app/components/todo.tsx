@@ -6,9 +6,8 @@ import { useSelector, useDispatch } from "react-redux";
 // Import action từ file slice
 import {
   ITodo,
-  addTodo,
-  deleteTodo,
-  updateTodo,
+  getTodo,
+  deleteAllTodoCompled,
 } from "../redux/reducers/todoReducer";
 
 import Modals from "./modal";
@@ -30,12 +29,6 @@ export interface IModalProps {
   showModal: boolean;
   editTitle: string;
   handleClose: () => void;
-  handleUpdateTodo: (todoUpdate: ITodo) => void;
-  handleDeleteTodo: (id: number) => void;
-}
-
-export interface IInputAddProps {
-  addNewTodo: (newTodo: ITodo) => void;
 }
 
 export default function Todo() {
@@ -46,19 +39,18 @@ export default function Todo() {
   const [show, setShow] = useState(false);
   const [editTitle, setEditTitle] = useState("Edited");
 
-  const [lists, setLists] = useState<ITodo[]>(todos);
-
   const [todo, setTodo] = useState<ITodo>({
-    id: 0,
     title: "",
     status: 0,
     active: true,
   });
 
-  // Cập nhật local state khi store thay đổi
   useEffect(() => {
-    setLists(todos);
-  }, [todos]);
+    fetch("http://localhost:3001/todo")
+      .then((res) => res.json())
+      .then((data) => dispatch(getTodo(data)))
+      .catch((err) => console.error("Lỗi fetch:", err));
+  }, [dispatch]);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -77,25 +69,32 @@ export default function Todo() {
     setTodo(todo);
   };
 
-  const addNewTodo = (newTodo: ITodo) => {
-    dispatch(addTodo(newTodo));
-  };
+  const handleDeleteCompleted = async () => {
+    try {
+      // Gửi request PATCH tới endpoint xử lý hàng loạt
+      const response = await fetch(
+        "http://localhost:3001/todo/remove-completed",
+        {
+          method: "PATCH",
+        },
+      );
 
-  const handleUpdateTodo = (todoUpdate: ITodo) => {
-    dispatch(updateTodo(todoUpdate));
-
-    handleClose();
-  };
-
-  const handleDeleteTodo = (id: number) => {
-    dispatch(deleteTodo(id));
-
-    handleClose();
+      if (response.ok) {
+        // Sau khi DB cập nhật xong, bạn cần load lại dữ liệu hoặc dispatch
+        // một action Redux để cập nhật giao diện (ẩn các item đã xong)
+        const data = await fetch("http://localhost:3001/todo").then((res) =>
+          res.json(),
+        );
+        dispatch(getTodo(data));
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa:", error);
+    }
   };
 
   return (
     <>
-      <InputAdd addNewTodo={addNewTodo} />
+      <InputAdd />
       {/* Card Todo List */}
       <Card
         className="border-0 shadow-sm p-4"
@@ -103,11 +102,11 @@ export default function Todo() {
       >
         <Card.Body className="p-0">
           <div className="todo-list" style={{ minHeight: "300px" }}>
-            {lists.map((list) => {
-              if (list.active) {
+            {todos.map((todo) => {
+              if (todo.active) {
                 return (
                   <div
-                    key={list.id}
+                    key={todo._id}
                     className="d-flex align-items-center mb-4 group cursor-pointer"
                   >
                     <></>
@@ -115,15 +114,15 @@ export default function Todo() {
                     <div
                       className="me-3"
                       style={{ cursor: "pointer" }}
-                      onClick={() => handleEdit(list)}
+                      onClick={() => handleEdit(todo)}
                     >
-                      {list.status === 1 ? (
+                      {todo.status === 1 ? (
                         <FontAwesomeIcon
                           icon={faCheckCircle}
                           size="2x"
                           style={{ color: "#D1914B" }}
                         />
-                      ) : list.status === 0 ? (
+                      ) : todo.status === 0 ? (
                         <FontAwesomeIcon
                           icon={faCircle}
                           size="2x"
@@ -142,14 +141,14 @@ export default function Todo() {
                     <span
                       className="flex-grow-1 fs-5"
                       style={{
-                        color: list.status === 0 ? "#333333" : "#BCBCBC",
+                        color: todo.status === 0 ? "#333333" : "#BCBCBC",
                         textDecoration:
-                          list.status === 1 ? "line-through" : "none",
+                          todo.status === 1 ? "line-through" : "none",
                         fontWeight: "500",
                       }}
-                      onClick={() => handleEdit(list)}
+                      onClick={() => handleEdit(todo)}
                     >
-                      {list.title}
+                      {todo.title}
                     </span>
 
                     {/* Trash Icon */}
@@ -161,7 +160,7 @@ export default function Todo() {
                         opacity: 0.6,
                       }}
                       className="trash-hover"
-                      onClick={() => handleDelete(list)}
+                      onClick={() => handleDelete(todo)}
                     />
                   </div>
                 );
@@ -175,13 +174,7 @@ export default function Todo() {
               variant="link"
               className="text-decoration-none fw-bold d-flex align-items-center justify-content-center mx-auto"
               style={{ color: "#D1914B" }}
-              onClick={() => {
-                const updatedLists = lists.map((item) => ({
-                  ...item,
-                  active: false,
-                }));
-                setLists(updatedLists);
-              }}
+              onClick={() => handleDeleteCompleted()}
             >
               <FontAwesomeIcon
                 icon={faMobileAlt}
@@ -198,8 +191,6 @@ export default function Todo() {
         showModal={show}
         editTitle={editTitle}
         handleClose={handleClose}
-        handleUpdateTodo={handleUpdateTodo}
-        handleDeleteTodo={handleDeleteTodo}
       />
     </>
   );

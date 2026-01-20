@@ -8,10 +8,18 @@ import Alert from "react-bootstrap/Alert";
 
 import { IModalProps } from "./todo";
 
-export default function Modals(props: IModalProps) {
-  const { todo, showModal, editTitle, handleClose, handleUpdateTodo, handleDeleteTodo } = props;
+import { RootState } from "../redux/configStore"; // Import kiểu RootState bạn đã định nghĩa
+import { useSelector, useDispatch } from "react-redux";
+// Import action từ file slice
+import { ITodo, deleteTodo, updateTodo } from "../redux/reducers/todoReducer";
 
-  const [todoUpdate, setTodoUpdate] = useState(todo);
+export default function Modals(props: IModalProps) {
+  const todos = useSelector((state: RootState) => state.todoReducer.todos);
+  const dispatch = useDispatch();
+
+  const { todo, showModal, editTitle, handleClose } = props;
+
+  const [todoUpdate, setTodoUpdate] = useState<ITodo>(todo);
 
   useEffect(() => {
     // Mỗi khi props.todo thay đổi (khi bạn bấm nút Edit khác),
@@ -22,7 +30,7 @@ export default function Modals(props: IModalProps) {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     // console.log("Changing:", name, value);
@@ -30,6 +38,47 @@ export default function Modals(props: IModalProps) {
       ...todoUpdate,
       [name]: name === "status" ? Number(value) : value,
     });
+  };
+
+  const handleUpdateTodo = async () => {
+    if (todoUpdate.title.trim() === "" || todoUpdate.status === undefined)
+      return;
+
+    try {
+      // 1. Gửi request POST lên NestJS (Cổng 3001)
+      const response = await fetch("http://localhost:3001/todo", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(todoUpdate),
+      });
+
+      if (response.ok) {
+        const savedTodo = await response.json();
+        dispatch(updateTodo(savedTodo)); // Cập nhật vào Redux Store
+      }
+    } catch (error) {
+      console.error("Lỗi khi update Todo:", error);
+    }
+
+    handleClose();
+  };
+
+  const handleDeleteTodo = async (_id: string) => {
+    try {
+      // Gửi request DELETE kèm theo _id
+      const response = await fetch(`http://localhost:3001/todo/${_id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Sau khi DB xóa xong, gọi dispatch để xóa nốt trên giao diện
+        dispatch(deleteTodo(_id));
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa:", error);
+    }
+
+    handleClose();
   };
   return (
     <Modal show={showModal} onHide={handleClose}>
@@ -74,14 +123,14 @@ export default function Modals(props: IModalProps) {
           Close
         </Button>
         {editTitle === "Edited" ? (
-          <Button
-            variant="primary"
-            onClick={() => handleUpdateTodo(todoUpdate)}
-          >
+          <Button variant="primary" onClick={() => handleUpdateTodo()}>
             Save Changes
           </Button>
         ) : (
-          <Button variant="secondary" onClick={() => handleDeleteTodo(todo.id)}>
+          <Button
+            variant="secondary"
+            onClick={() => handleDeleteTodo(todo._id!)}
+          >
             Delete
           </Button>
         )}
