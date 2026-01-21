@@ -1,14 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 
-import { RootState } from "../redux/configStore"; // Import kiểu RootState bạn đã định nghĩa
+import { RootState } from "../../redux/configStore"; // Import kiểu RootState bạn đã định nghĩa
 import { useSelector, useDispatch } from "react-redux";
 // Import action từ file slice
 import {
   ITodo,
   getTodo,
   deleteAllTodoCompled,
-} from "../redux/reducers/todoReducer";
+} from "../../redux/reducers/todoReducer";
 
 import Modals from "./modal";
 import InputAdd from "./inputAdd";

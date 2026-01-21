@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "bootstrap/dist/css/bootstrap.min.css";
 import BootstrapClient from "./BootstrapClient";
 import "./globals.css";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { config } from "@fortawesome/fontawesome-svg-core";
+config.autoAddCss = false; // Ngăn Font Awesome tự thêm CSS vì đã import ở trên
 
 import StoreProvider from "./StoreProvider";
 

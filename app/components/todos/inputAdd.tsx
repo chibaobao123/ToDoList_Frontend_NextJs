@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 
-import { RootState } from "../redux/configStore"; // Import kiểu RootState bạn đã định nghĩa
+import { RootState } from "../../redux/configStore"; // Import kiểu RootState bạn đã định nghĩa
 import { useSelector, useDispatch } from "react-redux";
 // Import action từ file slice
-import { ITodo, addTodo } from "../redux/reducers/todoReducer";
+import { ITodo, addTodo } from "../../redux/reducers/todoReducer";
 
 export default function InputAdd() {
   // Lấy dữ liệu từ slice 'todos'
