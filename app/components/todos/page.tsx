@@ -1,10 +1,12 @@
 "use client";
 import Todo from "./todo";
+import NavbarTodo from "./navbarTodo";
 
 import { Container, Row, Col } from "react-bootstrap";
 export default function TodosPage() {
   return (
     <>
+      <NavbarTodo />
       <div
         style={{
           backgroundColor: "#FDF8F3",

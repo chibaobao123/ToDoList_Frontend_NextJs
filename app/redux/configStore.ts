@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 // Import mặc định từ file todoSlice (chính là todoSlice.reducer)
 import todoReducer from "./reducers/todoReducer";
+import usersReducer from "./reducers/usersReducer";
 
 export const makeStore = () => {
   return configureStore({
@@ -8,6 +9,7 @@ export const makeStore = () => {
       // Key này phải khớp với cách bạn truy cập trong useSelector
       // (ví dụ: state.todoReducer.todos)
       todoReducer: todoReducer,
+      usersReducer: usersReducer,
     },
   });
 };
