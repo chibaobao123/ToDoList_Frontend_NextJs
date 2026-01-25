@@ -1,21 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-// 1. Định nghĩa interface cho từng item Todo
-export interface ITodo {
-  _id?: string; // Dấu '?' nghĩa là khi tạo mới (Add) thì chưa cần ID, DB sẽ tự tạo
-  title: string;
-  status: number;
-  active: boolean;
-}
-
-// 2. Định nghĩa interface cho State
-interface ITodoState {
-  todos: ITodo[];
-}
-
-const initialState: ITodoState = {
-  todos: [],
-};
+import { ITodo, ITodoState, initialState } from "../../interfaces/todo.interface";
 
 // 3. Tạo Slice - Kết hợp cả Reducer và Actions vào một nơi
 const todoSlice = createSlice({

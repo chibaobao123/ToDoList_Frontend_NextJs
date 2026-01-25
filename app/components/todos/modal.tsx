@@ -11,7 +11,8 @@ import { IModalProps } from "./todo";
 import { RootState } from "../../redux/configStore"; // Import kiểu RootState bạn đã định nghĩa
 import { useSelector, useDispatch } from "react-redux";
 // Import action từ file slice
-import { ITodo, deleteTodo, updateTodo } from "../../redux/reducers/todoReducer";
+import { deleteTodo, updateTodo } from "../../redux/reducers/todoReducer";
+import { ITodo } from "../../interfaces/todo.interface";
 
 export default function Modals(props: IModalProps) {
   const todos = useSelector((state: RootState) => state.todoReducer.todos);

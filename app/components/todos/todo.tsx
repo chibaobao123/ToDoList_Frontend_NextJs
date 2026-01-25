@@ -5,10 +5,10 @@ import { RootState } from "../../redux/configStore"; // Import kiểu RootState 
 import { useSelector, useDispatch } from "react-redux";
 // Import action từ file slice
 import {
-  ITodo,
   getTodo,
   deleteAllTodoCompled,
 } from "../../redux/reducers/todoReducer";
+import { ITodo } from "../../interfaces/todo.interface";
 
 import Modals from "./modal";
 import InputAdd from "./inputAdd";

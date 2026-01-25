@@ -7,7 +7,7 @@ export default function LoginPage() {
   return (
     <div
       className="min-vh-100 d-flex align-items-center justify-content-center p-3 p-md-5"
-      style={{ backgroundColor: "#FDF2E9" }}
+      style={{ backgroundColor: "#fceadaff" }}
     >
       {/* Container chính */}
       <div

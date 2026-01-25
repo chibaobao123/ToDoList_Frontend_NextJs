@@ -1,22 +1,27 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { isValidEmail } from "../../utils/validations";
 
 import { RootState } from "../../redux/configStore";
 import { useSelector, useDispatch } from "react-redux";
-import { setLoginUser } from "../../redux/reducers/usersReducer";
+import { setLoginUser, setRememberMe } from "../../redux/reducers/usersReducer";
+
+import RememberMe from "./rememberMe";
 
 export default function LoginForm() {
-  const users = useSelector((state: RootState) => state.usersReducer);
+  const { rememberMe, loginUser } = useSelector(
+    (state: RootState) => state.usersReducer,
+  );
   const dispatch = useDispatch();
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(loginUser || "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [errorEmail, setErrorEmail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
+
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,8 +65,11 @@ export default function LoginForm() {
         // 3. Lưu token vào localStorage (hoặc Cookies) để dùng cho các API sau
         localStorage.setItem("access_token", access_token);
         localStorage.setItem("email", email);
+        if (rememberMe) {
+          localStorage.setItem("rememberMe", rememberMe.toString());
+        }
         dispatch(setLoginUser(email));
-         // Cập nhật Redux với thông tin user đăng nhập
+        // Cập nhật Redux với thông tin user đăng nhập
         // 4. Chuyển hướng sang trang danh sách công việc (todos)
         router.push("./components/todos");
       }
@@ -75,6 +83,15 @@ export default function LoginForm() {
       }
     }
   };
+
+  useEffect(() => {
+    // Nếu đã chọn Remember Me, tự động điền email
+    if (rememberMe) {
+      const emailExist = localStorage.getItem("email") || "";
+      dispatch(setLoginUser(emailExist));
+    }
+  }, [rememberMe]);
+
   return (
     <>
       <form>
@@ -87,6 +104,7 @@ export default function LoginForm() {
               `form-control ${error || errorEmail ? "is-invalid" : ""}`
             }
             placeholder="mail@abc.com"
+            defaultValue={rememberMe ? loginUser || "" : ""}
             required={true}
             onChange={(e) => handleChange(e)}
           />
@@ -112,29 +130,7 @@ export default function LoginForm() {
           {error && <div className="invalid-feedback">{error}</div>}
         </div>
 
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="rememberMe"
-              style={{ accentColor: "#6B2D5C" }}
-            />
-            <label
-              className="form-check-label small text-secondary"
-              htmlFor="rememberMe"
-            >
-              Remember Me
-            </label>
-          </div>
-          <a
-            href="#"
-            className="small fw-bold text-decoration-none"
-            style={{ color: "#6B2D5C" }}
-          >
-            Forgot Password?
-          </a>
-        </div>
+        <RememberMe />
 
         <button
           type="submit"
