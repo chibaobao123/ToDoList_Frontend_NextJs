@@ -6,6 +6,7 @@ import { isValidEmail } from "../../utils/validations";
 
 import { RootState } from "../../redux/configStore";
 import { useSelector, useDispatch } from "react-redux";
+import { setLoginUser } from "../../redux/reducers/usersReducer";
 
 export default function LoginForm() {
   const users = useSelector((state: RootState) => state.usersReducer);
@@ -59,7 +60,8 @@ export default function LoginForm() {
         // 3. Lưu token vào localStorage (hoặc Cookies) để dùng cho các API sau
         localStorage.setItem("access_token", access_token);
         localStorage.setItem("email", email);
-
+        dispatch(setLoginUser(email));
+         // Cập nhật Redux với thông tin user đăng nhập
         // 4. Chuyển hướng sang trang danh sách công việc (todos)
         router.push("./components/todos");
       }

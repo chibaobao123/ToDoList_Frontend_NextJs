@@ -1,9 +1,20 @@
 "use client";
 import Todo from "./todo";
 import NavbarTodo from "./navbarTodo";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import { Container, Row, Col } from "react-bootstrap";
 export default function TodosPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token || token === "" || token === null || token === undefined) {
+      router.push("/");
+    }
+  }, [router]);
+
   return (
     <>
       <NavbarTodo />

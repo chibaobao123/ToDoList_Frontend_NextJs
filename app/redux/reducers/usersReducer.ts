@@ -8,10 +8,12 @@ export interface User {
 
 // 2. Định nghĩa interface cho State
 interface UserState {
+  loginUser: string | null;
   users: User[];
 }
 
 const initialState: UserState = {
+  loginUser: null,
   users: [],
 };
 
@@ -19,11 +21,16 @@ const initialState: UserState = {
 const userSlice = createSlice({
   name: "users",
   initialState,
-  reducers: {},
+  reducers: {
+    // Action để set thông tin user đăng nhập
+    setLoginUser: (state, action: PayloadAction<string>) => {
+      state.loginUser = action.payload;
+    },
+  },
 });
 
 // Xuất các Actions để sử dụng trong Component (dispatch)
-export const {} = userSlice.actions;
+export const { setLoginUser } = userSlice.actions;
 
 // Xuất Reducer để đưa vào Store
 export default userSlice.reducer;
