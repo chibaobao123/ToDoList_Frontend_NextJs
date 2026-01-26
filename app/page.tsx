@@ -11,9 +11,9 @@ export default function Home() {
   useEffect(() => {
     // Nếu token còn hạn, "đá" người dùng sang trang todo ngay lập tức
     if (isTokenValid()) {
-      router.push("./components/todos");
+      router.push("/components/todos");
     } else {
-      localStorage.removeItem("access_token");
+      localStorage.clear();
       router.push("/");
     }
   }, [router]);
