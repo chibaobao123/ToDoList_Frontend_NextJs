@@ -53,7 +53,7 @@ export default function LoginForm() {
 
     try {
       // 1. Gửi yêu cầu đăng nhập đến Backend NestJS
-      const response = await axios.post("http://localhost:3001/users/login", {
+      const response = await axios.post("http://localhost:3001/auth/login", {
         email,
         password,
       });

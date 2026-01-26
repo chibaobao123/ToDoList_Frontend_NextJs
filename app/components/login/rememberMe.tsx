@@ -9,6 +9,17 @@ export default function RememberMe() {
   const { rememberMe } = useSelector((state: RootState) => state.usersReducer);
   const dispatch = useDispatch();
 
+  const handleRememberMe = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = e.target.checked;
+    dispatch(setRememberMe(isChecked));
+
+    if (!isChecked) {
+      localStorage.removeItem("rememberMe");
+    } else {
+      localStorage.setItem("rememberMe", isChecked.toString());
+    }
+  };
+
   useEffect(() => {
     // Lấy email đã lưu từ LocalStorage
     const savedEmail = localStorage.getItem("rememberMe");
@@ -28,7 +39,7 @@ export default function RememberMe() {
           id="rememberMe"
           style={{ accentColor: "#6B2D5C" }}
           checked={rememberMe}
-          onChange={(e) => dispatch(setRememberMe(e.target.checked))}
+          onChange={(e) => handleRememberMe(e)}
         />
         <label
           className="form-check-label small text-secondary"

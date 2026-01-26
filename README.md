@@ -38,3 +38,23 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 # jwt-decode
 
 npm install jwt-decode
+
+# auth google
+
+npm install @react-oauth/google@latest
+
+Cách lấy Client ID từ Google Cloud
+
+1. Truy cập Google Cloud Console.
+
+2. Tạo một Project mới.
+
+3. Vào APIs & Services > Credentials.
+
+4. Nhấn Create Credentials > OAuth client ID.
+
+5. Chọn Application type là Web application.
+
+6. Tại mục Authorized JavaScript origins, thêm: http://localhost:3000.
+
+7. Copy Client ID vừa tạo dán vào code ở bước 2.

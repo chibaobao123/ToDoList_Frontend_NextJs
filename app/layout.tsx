@@ -8,6 +8,7 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 config.autoAddCss = false; // Ngăn Font Awesome tự thêm CSS vì đã import ở trên
 
 import StoreProvider from "./StoreProvider";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,7 +35,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <StoreProvider>{children}</StoreProvider>
+        {/* Thay YOUR_CLIENT_ID bằng ID từ Google Cloud Console */}
+        <GoogleOAuthProvider clientId="88605138508-6hbcbb2c2fo8efc745ht3a7jkgd092i4.apps.googleusercontent.com">
+          <StoreProvider>{children}</StoreProvider>
+        </GoogleOAuthProvider>
+
         <BootstrapClient />
       </body>
     </html>
