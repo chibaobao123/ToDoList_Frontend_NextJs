@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import { Row, Col, Form, Button } from "react-bootstrap";
+import { Row, Col, Form, Button, Alert } from "react-bootstrap";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -11,20 +12,62 @@ export default function RegisterForm() {
     email: "",
     password: "",
     confirmPassword: "",
-    rememberMe: false,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value, type, checked } = e.target;
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    const { id, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [id]: type === "checkbox" ? checked : value,
+      [id]: value,
     }));
+  };
+
+  const register = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match!");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/users/register",
+        {
+          email: formData.email,
+          password: formData.password,
+        },
+      );
+
+      const { status } = response.data;
+
+      if (status !== 201) {
+        throw setError("Registration failed");
+      }
+
+      setSuccess("Đăng nhập thành công!!!");
+
+      // Đăng ký thành công, chuyển hướng đến trang đăng nhập
+      setTimeout(() => {
+        setError(null);
+        setSuccess(null);
+        router.push("/");
+      }, 2000);
+    } catch (err: unknown) {
+      setError((err as Error).message);
+    }
   };
 
   return (
     <>
-      <Form>
+      <Form onSubmit={register}>
         <Form.Group className="mb-3">
           <Form.Label className="fw-bold small">Email</Form.Label>
           <Form.Control
@@ -67,17 +110,16 @@ export default function RegisterForm() {
             </Form.Group>
           </Col>
         </Row>
-
-        <Form.Group className="mb-4 d-flex justify-content-between">
-          <Form.Check
-            type="checkbox"
-            id="rememberMe"
-            label="Remember Me"
-            checked={formData.rememberMe}
-            onChange={handleChange}
-          />
-        </Form.Group>
-
+        {error && (
+          <Alert key="danger" variant="danger">
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert key="success" variant="success">
+            {success}
+          </Alert>
+        )}
         <Button
           type="submit"
           className="w-100 py-2 border-0 shadow-sm"

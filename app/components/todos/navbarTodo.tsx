@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 
 import { RootState } from "../../redux/configStore";
 import { useSelector, useDispatch } from "react-redux";
-import { setLoginUser } from "../../redux/reducers/usersReducer";
+import { setLoginUser, setNameUser } from "../../redux/reducers/usersReducer";
 
 export default function NavbarTodo() {
-  const { loginUser, rememberMe } = useSelector(
+  const { loginUser, rememberMe, name } = useSelector(
     (state: RootState) => state.usersReducer,
   );
   const dispatch = useDispatch();
@@ -23,7 +23,9 @@ export default function NavbarTodo() {
 
   useEffect(() => {
     const email = localStorage.getItem("email");
+    const name = localStorage.getItem("name");
     if (email) dispatch(setLoginUser(email));
+    if (name) dispatch(setNameUser(name));
   }, []);
   return (
     <>
@@ -33,7 +35,7 @@ export default function NavbarTodo() {
           <Navbar.Toggle />
           <Navbar.Collapse className="justify-content-end">
             <NavDropdown
-              title={<span>{loginUser || "email@gmail.com"}</span>}
+              title={<span>{name ? name : loginUser}</span>}
               id="nav-dropdown-user"
               className="custom-dropdown"
             >

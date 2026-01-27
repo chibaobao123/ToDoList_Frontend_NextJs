@@ -17,9 +17,10 @@ export default function GoogleLogin() {
         // Lưu token hệ thống và email vào localStorage
         localStorage.setItem("access_token", res.data.access_token);
         localStorage.setItem("email", res.data.email);
+        localStorage.setItem("email", res.data.name);
 
         // Điều hướng sang trang todos
-        router.push("./components/todos");
+        router.push("/components/todos");
       } catch (err: unknown) {
         // Dùng unknown để hết gạch đỏ any
         if (axios.isAxiosError(err)) {

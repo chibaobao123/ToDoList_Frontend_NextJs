@@ -13,11 +13,14 @@ const userSlice = createSlice({
     setRememberMe: (state, action: PayloadAction<boolean>) => {
       state.rememberMe = action.payload;
     },
+    setNameUser: (state, action: PayloadAction<string>) => {
+      state.name = action.payload;
+    },
   },
 });
 
 // Xuất các Actions để sử dụng trong Component (dispatch)
-export const { setLoginUser, setRememberMe } = userSlice.actions;
+export const { setLoginUser, setRememberMe, setNameUser } = userSlice.actions;
 
 // Xuất Reducer để đưa vào Store
 export default userSlice.reducer;

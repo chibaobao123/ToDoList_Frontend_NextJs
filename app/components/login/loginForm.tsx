@@ -6,7 +6,7 @@ import { isValidEmail } from "../../utils/validations";
 
 import { RootState } from "../../redux/configStore";
 import { useSelector, useDispatch } from "react-redux";
-import { setLoginUser, setRememberMe } from "../../redux/reducers/usersReducer";
+import { setLoginUser, setNameUser } from "../../redux/reducers/usersReducer";
 
 import RememberMe from "./rememberMe";
 
@@ -59,16 +59,16 @@ export default function LoginForm() {
       });
 
       // 2. Lấy access_token từ dữ liệu trả về
-      const { access_token } = response.data;
+      const { access_token, name } = response.data;
 
       if (access_token) {
         // 3. Lưu token vào localStorage (hoặc Cookies) để dùng cho các API sau
         localStorage.setItem("access_token", access_token);
         localStorage.setItem("email", email);
+        localStorage.setItem("name", name);
         if (rememberMe) {
           localStorage.setItem("rememberMe", rememberMe.toString());
         }
-        dispatch(setLoginUser(email));
         // Cập nhật Redux với thông tin user đăng nhập
         // 4. Chuyển hướng sang trang danh sách công việc (todos)
         router.push("./components/todos");

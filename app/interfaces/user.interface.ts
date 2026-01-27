@@ -7,12 +7,14 @@ export interface User {
 // 2. Định nghĩa interface cho State
 export interface UserState {
   loginUser: string | null;
+  name: string | null;
   rememberMe: boolean;
   users: User[];
 }
 
 export const initialState: UserState = {
   loginUser: null,
+  name: null,
   rememberMe: false,
   users: [],
 };
