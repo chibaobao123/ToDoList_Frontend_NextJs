@@ -8,6 +8,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { ITodo } from "../../interfaces/todo.interface";
 import { addTodo } from "../../redux/reducers/todoReducer";
 
+import axios from "axios";
+
 export default function InputAdd() {
   // Lấy dữ liệu từ slice 'todos'
   const todos = useSelector((state: RootState) => state.todoReducer.todos);
@@ -23,26 +25,38 @@ export default function InputAdd() {
   };
   const addNewTodo = async () => {
     if (newTodo.trim() === "") return;
+    try {
+      // Tạo object đúng kiểu ITodo mà Redux đang chờ
+      const todoToDispatch: ITodo = {
+        title: newTodo,
+        status: 0,
+        active: true,
+      };
+      const token = localStorage.getItem("access_token");
 
-    // Tạo object đúng kiểu ITodo mà Redux đang chờ
-    const todoToDispatch: ITodo = {
-      title: newTodo,
-      status: 0,
-      active: true,
-    };
+      // 1. Gọi API gửi lên DB
+      const response = await axios.post("http://localhost:3001/todo", {
+        todoToDispatch,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    // 1. Gọi API gửi lên DB
-    const response = await fetch("http://localhost:3001/todo", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(todoToDispatch),
-    });
-    const dataFromServer = await response.json();
+      const dataFromServer = await response.data;
 
-    // 2. Sau khi DB có dữ liệu, mới cập nhật Redux
-    dispatch(addTodo(dataFromServer));
+      // 2. Sau khi DB có dữ liệu, mới cập nhật Redux
+      dispatch(addTodo(dataFromServer));
 
-    setNewTodo(""); // Reset ô input
+      setNewTodo(""); // Reset ô input
+    } catch (err: unknown) {
+      // Thay 'any' bằng kiểm tra instance hoặc ép kiểu an toàn
+      if (axios.isAxiosError(err)) {
+        const message = err.response?.data?.message || "Thêm Todo thất bại!";
+        console.log(message);
+      } else {
+        console.log("Đã xảy ra lỗi không xác định");
+      }
+    }
   };
 
   return (

@@ -1,13 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import { RootState } from "../../redux/configStore"; // Import kiểu RootState bạn đã định nghĩa
 import { useSelector, useDispatch } from "react-redux";
+
+import axios from "axios";
+
 // Import action từ file slice
-import {
-  getTodo,
-  deleteAllTodoCompled,
-} from "../../redux/reducers/todoReducer";
+import { getTodo } from "../../redux/reducers/todoReducer";
 import { ITodo } from "../../interfaces/todo.interface";
 
 import Modals from "./modal";
@@ -36,6 +37,8 @@ export default function Todo() {
   const todos = useSelector((state: RootState) => state.todoReducer.todos);
   const dispatch = useDispatch();
 
+  const router = useRouter();
+
   const [show, setShow] = useState(false);
   const [editTitle, setEditTitle] = useState("Edited");
 
@@ -45,11 +48,33 @@ export default function Todo() {
     active: true,
   });
 
+  const getTodoOnServer = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+
+      // 1. Gửi yêu cầu đăng nhập đến Backend NestJS
+      const response = await axios.get("http://localhost:3001/todo", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // 2. Lấy access_token từ dữ liệu trả về
+      dispatch(getTodo(response.data));
+    } catch (err: unknown) {
+      // Thay 'any' bằng kiểm tra instance hoặc ép kiểu an toàn
+      if (axios.isAxiosError(err)) {
+        const message =
+          err.response?.data?.message || "Không tải được To do list!";
+        console.log(message);
+      } else {
+        console.log("Đã xảy ra lỗi không xác định");
+      }
+    }
+  };
+
   useEffect(() => {
-    fetch("http://localhost:3001/todo")
-      .then((res) => res.json())
-      .then((data) => dispatch(getTodo(data)))
-      .catch((err) => console.error("Lỗi fetch:", err));
+    getTodoOnServer();
   }, [dispatch]);
 
   const handleClose = () => setShow(false);
